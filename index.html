@@ -771,9 +771,9 @@
 <nav class="tabs">
   <div class="tab-inner">
     <button class="tab active" data-tab="intro">📋 方案介紹與報價試算</button>
-    <button class="tab" data-tab="survey">📝 分公司意願表單 <span class="badge" id="surveyBadge">0/9</span></button>
+    <button class="tab admin-only" data-tab="survey">📝 分公司意願表單 <span class="badge" id="surveyBadge">0/9</span></button>
     <button class="tab admin-only" data-tab="dashboard">📊 統計彙整儀表板</button>
-    <button class="tab admin-only" data-tab="report">📑 給總經理之提報</button>
+    <button class="tab" data-tab="report">📊 調查結果彙整</button>
   </div>
 </nav>
 
@@ -1121,13 +1121,13 @@
 </section>
 
 <!-- ============================================ -->
-<!-- PANEL 4: 提報報告 -->
+<!-- PANEL 4: 調查結果彙整（公開分享給全公司）-->
 <!-- ============================================ -->
 <section class="panel" id="panel-report">
   <div class="toolbar">
-    <span class="label">提報文件：</span>
-    <button class="btn btn-primary" onclick="window.print()">🖨 列印 / 另存 PDF</button>
-    <button class="btn btn-secondary" onclick="refreshReport()">🔄 重新整理報告</button>
+    <span class="label">操作：</span>
+    <button class="btn btn-secondary" onclick="refreshReport()">🔄 重新整理</button>
+    <button class="btn btn-secondary admin-only-btn" onclick="window.print()">🖨 列印 / 另存 PDF</button>
   </div>
 
   <div id="reportContent">
@@ -1303,12 +1303,83 @@ function persistData() {
   }
 }
 
+// 內嵌的官方彙整資料（給所有分公司主管查看用）
+// 若有新分公司補填，可在此更新後重新部署
+const EMBEDDED_DATA = {
+  "台北直客": {
+    "branch": "台北直客", "manager": "徐國峰", "staffCount": "9",
+    "acceptance": "低", "ageGroup": ">65",
+    "opinion": "這個對業務和客人一定都有過渡期，但是這是趨勢必要須去導入電子簽約，不僅可以提高效率會更多時間去提升服務品質，也可以減少紙張的浪費及傳真或email、寄信等繁雜的手續！",
+    "timeline": "1month", "futureFeatures": "電子代轉", "remark": "",
+    "concerns": ["同業/同仁適應過渡期", "客戶不熟悉電子操作"],
+    "willingness": 5, "completed": true
+  },
+  "台北同業": {
+    "branch": "台北同業", "manager": "陳建宏", "staffCount": "22",
+    "acceptance": "低", "ageGroup": ">65",
+    "opinion": "若像保險單位這樣遊業務員引導簽約，相對簡單很多，同業比較麻煩的是要教同業，但其實一個過渡期跟同業分析利弊(未來有爭議時也不用擔心沒簽約)，或是原電子合約pdf word檔客人更不知道怎麼簽。",
+    "timeline": "immediate",
+    "futureFeatures": "主管/業務同時看到合約簽訂狀況與簽約效期(設置提醒)\n初步簡易的操做流程檔(業務與同業間教學使用)\n",
+    "remark": "主管/業務同時看到合約簽訂狀況與簽約效期(設置提醒)\n初步簡易的操做流程檔(業務與同業間教學使用)\n",
+    "concerns": ["客戶年齡層接受度", "同業/同仁適應過渡期", "客戶不熟悉電子操作", "系統穩定性"],
+    "willingness": 5, "completed": true
+  },
+  "台北專案企劃部": {
+    "branch": "台北專案企劃部", "manager": "魏澤民", "staffCount": "3",
+    "acceptance": "高", "ageGroup": "50-65",
+    "opinion": "這是未來的趨勢強烈支持",
+    "timeline": "immediate", "futureFeatures": "參加企業的簽約流程", "remark": "",
+    "concerns": ["系統穩定性", "資安隱私"],
+    "willingness": 5, "completed": true
+  },
+  "桃園": {
+    "branch": "桃園", "manager": "林淑燕", "staffCount": "6",
+    "acceptance": "低", "ageGroup": "50-65",
+    "opinion": "電子簽約更加便利成交後的手續，對於無法列印紙本的人、不在台灣的人、或是緊急狀況等不及寄紙本的就可以線上簽署，比起郵寄更加減省時間(但不一定節省成本，郵寄要錢系統的建立也是需要花費)，但我們大多客人為長者，可能不熟悉手機上的操作，不會簽、誤按等等需要花費更多時間來遠端教學，之前也有人提過回傳的線上簽署真的是本人簽的嗎諸如此類的疑慮，未來若發生糾紛會不會出現「這不是我簽的」這樣的爭議?或是這個系統會搭配什麼驗證方式之類的嗎?\n目前部分大型同業（如雄獅、易遊網等）採用的是在自家平台完成條款閱讀、勾選同意及線上付款的模式，付款本身也具備一定程度的身分驗證效果，整體都是在自家網頁完成，不用連結到外部網站客人可能會有資安顧慮。\n但確實其便利性還是覺得電子簽署有必要導入，只是用什麼方式，並且也維持紙本方式雙向都可以進行。\n未來若能與報名、付款、客戶資料系統整合，讓客戶在同一平台完成所有程序，將更能發揮電子化效益。",
+    "timeline": "1month", "futureFeatures": "如c4", "remark": "如c4",
+    "concerns": ["客戶不熟悉電子操作", "法律效力疑慮", "資安隱私", "高齡客戶3C使用困難"],
+    "willingness": 4, "completed": true
+  },
+  "新竹": {
+    "branch": "新竹", "manager": "洪銘鍵", "staffCount": "4",
+    "acceptance": "中", "ageGroup": "mixed",
+    "opinion": "期提升效率，降低作業時間。",
+    "timeline": "1month", "futureFeatures": "", "remark": "",
+    "concerns": ["同業/同仁適應過渡期", "客戶不熟悉電子操作"],
+    "willingness": 5, "completed": true
+  },
+  "台中": {
+    "branch": "台中", "manager": "梁慧昤", "staffCount": "11",
+    "acceptance": "中", "ageGroup": "50-65",
+    "opinion": "", "timeline": "immediate", "futureFeatures": "", "remark": "",
+    "concerns": ["客戶年齡層接受度", "同業/同仁適應過渡期", "客戶不熟悉電子操作", "高齡客戶3C使用困難"],
+    "willingness": 4, "completed": true
+  },
+  "台南": {
+    "branch": "台南", "manager": "莊雅琪", "staffCount": "5",
+    "acceptance": "高", "ageGroup": "50-65",
+    "opinion": "", "timeline": "immediate",
+    "futureFeatures": "導入公司系統，讓合約書從系統自動導出後可直接設定好簽屬框", "remark": "",
+    "concerns": ["客戶年齡層接受度", "客戶不熟悉電子操作", "資安隱私", "高齡客戶3C使用困難"],
+    "willingness": 5, "completed": true
+  },
+  "高雄": {
+    "branch": "高雄", "manager": "李依玲", "staffCount": "9",
+    "acceptance": "中", "ageGroup": "50-65",
+    "opinion": "", "timeline": "3months", "futureFeatures": "", "remark": "",
+    "concerns": ["客戶年齡層接受度", "同業/同仁適應過渡期", "客戶不熟悉電子操作"],
+    "willingness": 4, "completed": true
+  }
+};
+
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) surveyData = JSON.parse(raw);
+    const local = raw ? JSON.parse(raw) : {};
+    // 合併：以內嵌官方資料為基底，本機資料覆蓋於上（讓使用者看到自己最新填寫）
+    surveyData = { ...EMBEDDED_DATA, ...local };
   } catch(e) {
-    surveyData = {};
+    surveyData = { ...EMBEDDED_DATA };
   }
 }
 
@@ -1814,9 +1885,9 @@ function renderReport() {
     container.innerHTML = `
       <div class="card">
         <div class="empty-state">
-          <div class="icon">📑</div>
-          <h3>提報報告尚未準備就緒</h3>
-          <p>請先完成至少一家分公司的意願表單填寫。</p>
+          <div class="icon">📊</div>
+          <h3>調查結果尚未公布</h3>
+          <p>各分公司意願調查彙整中，請稍後再來查看。</p>
         </div>
       </div>
     `;
@@ -1847,7 +1918,7 @@ function renderReport() {
   container.innerHTML = `
     <div class="card">
       <h2 style="text-align:center;color:var(--primary);font-size:24px;margin-bottom:8px;">
-        電子簽約系統導入意願評估提報
+        電子簽約系統導入意願調查｜全公司彙整成果
       </h2>
       <p style="text-align:center;color:var(--text-light);margin-bottom:20px;">
         ── 巨匠旅遊 × 律果科技 LegalSign.ai ──
@@ -1855,7 +1926,7 @@ function renderReport() {
 
       <div class="report-meta">
         <div class="m-item">
-          <div class="m-label">提報日期</div>
+          <div class="m-label">公布日期</div>
           <div class="m-value">${new Date().toLocaleDateString('zh-TW')}</div>
         </div>
         <div class="m-item">
@@ -1863,21 +1934,22 @@ function renderReport() {
           <div class="m-value">李宛宜</div>
         </div>
         <div class="m-item">
-          <div class="m-label">提報對象</div>
-          <div class="m-value">總經理</div>
-        </div>
-        <div class="m-item">
           <div class="m-label">已蒐集分公司數</div>
           <div class="m-value">${filled.length} / ${BRANCHES.length}</div>
+        </div>
+        <div class="m-item">
+          <div class="m-label">調查工具</div>
+          <div class="m-value">線上意願調查表</div>
         </div>
       </div>
 
       <div class="report-section">
-        <h3>一、提案背景</h3>
+        <h3>一、調查背景</h3>
         <p style="line-height:1.8;">
           因應公司數位轉型策略，本案評估與律果科技股份有限公司（LegalSign.ai）合作導入「律果簽旅遊合約專家」電子簽約系統，
-          以解決現行紙本契約往返耗時、歸檔困難、出團前才回收等傳統業務痛點。已於上週由律果科技進行產品簡報並提供報價單
-          （單號 L2026050035），本表彙整全台 ${BRANCHES.length} 家分公司主管意見以供決策參考。
+          以解決現行紙本契約往返耗時、歸檔困難、出團前才回收等傳統業務痛點。已於先前由律果科技進行產品簡報並提供報價單
+          （單號 L2026050035）。本頁彙整全台 ${BRANCHES.length} 家分公司主管的回饋意見，
+          與各位同仁共同了解推動方向，並做為後續導入規劃之參考。
         </p>
       </div>
 
@@ -1973,25 +2045,15 @@ function renderReport() {
       </div>
 
       <div class="report-section">
-        <h3>七、結論與建議</h3>
+        <h3>七、整體結論</h3>
         <div class="recommendation">
           ${recommendation}
         </div>
       </div>
 
-      <div class="report-section">
-        <h3>八、後續行動方案</h3>
-        <ul style="margin-left:24px;line-height:2;">
-          <li><strong>總經理裁示後 1 週內：</strong>與律果科技確認最終帳號數與簽約條件</li>
-          <li><strong>簽約後 2 週內：</strong>建立各分公司帳號、設定權限、匯入合約範本</li>
-          <li><strong>導入後 1 個月內：</strong>由律果科技完成各分公司線上教育訓練（含主管/業務同仁）</li>
-          <li><strong>導入後 3 個月：</strong>追蹤使用率、客戶接受度與痛點改善情形，回報優化建議</li>
-          <li><strong>導入後 6 個月：</strong>評估擴充帳號數或加值功能（如 AI 法務助理、合約資料庫等）</li>
-        </ul>
-      </div>
-
       <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border);text-align:center;color:var(--text-light);font-size:13px;">
-        本報告自動由「巨匠旅遊 × 律果簽 導入意願評估系統」產出 ｜ 產製時間：${new Date().toLocaleString('zh-TW')}
+        本頁面自動由「巨匠旅遊 × 律果簽 導入意願調查系統」彙整呈現 ｜ 最後更新：${new Date().toLocaleString('zh-TW')}<br>
+        如對調查結果有任何問題，請洽承辦人 李宛宜（wanyi_lee@artisan.com.tw）
       </div>
     </div>
   `;
